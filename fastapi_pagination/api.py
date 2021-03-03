@@ -11,9 +11,13 @@ from typing import (
     Sequence,
     Type,
     TypeVar,
+    Union,
+    cast,
 )
 
-from fastapi import Response
+from fastapi import APIRouter, Depends, FastAPI, Response
+from fastapi.dependencies.utils import get_parameterless_sub_dependant
+from fastapi.routing import APIRoute
 
 from .bases import AbstractPage, AbstractParams
 from .page import Page
@@ -83,7 +87,25 @@ def response() -> Optional[Response]:
     return response_value.get()
 
 
+def add_pagination_dependency(
+    parent: Union[APIRouter, FastAPI],
+    *,
+    params_type: Type[TAbstractParams] = cast(Any, PaginationParams),
+) -> None:
+    dependency = Depends(using_params(params_type))
+
+    for route in parent.routes:
+        if isinstance(route, APIRoute) and issubclass(route.response_model, AbstractPage):
+            route.dependant.dependencies.append(
+                get_parameterless_sub_dependant(
+                    depends=dependency,
+                    path=route.path_format,
+                )
+            )
+
+
 __all__ = [
+    "add_pagination_dependency",
     "create_page",
     "resolve_params",
     "response",

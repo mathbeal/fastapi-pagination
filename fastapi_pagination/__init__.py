@@ -1,4 +1,5 @@
 from .api import (
+    add_pagination_dependency,
     create_page,
     pagination_params,
     resolve_params,

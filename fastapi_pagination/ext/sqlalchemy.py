@@ -12,8 +12,8 @@ T = TypeVar("T", Select, Query)
 
 
 def paginate_query(query: T, params: AbstractParams) -> T:
-    params = params.to_limit_offset()
-    return query.limit(params.limit).offset(params.offset)
+    limit_offset_params = params.to_limit_offset()
+    return query.limit(limit_offset_params.limit).offset(limit_offset_params.offset)
 
 
 def paginate(query: Query, params: Optional[AbstractParams] = None) -> AbstractPage:

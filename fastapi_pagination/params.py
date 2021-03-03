@@ -1,16 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
-
-from fastapi import Query, params
+from fastapi import Query
 from pydantic.dataclasses import dataclass
 
-
-def _get_value(val: Any) -> Any:
-    if isinstance(val, params.Query):
-        return val.default
-
-    return val
+from .bases import LimitOffsetParams
 
 
 @dataclass
@@ -18,12 +11,8 @@ class PaginationParams:
     page: int = Query(0, ge=0, description="Page number")
     size: int = Query(50, gt=0, le=100, description="Page size")
 
-    def __post_init__(self) -> None:
-        self.page = _get_value(self.page)
-        self.size = _get_value(self.size)
-
-    def to_limit_offset(self) -> LimitOffsetPaginationParams:
-        return LimitOffsetPaginationParams(
+    def to_limit_offset(self) -> LimitOffsetParams:
+        return LimitOffsetParams(
             limit=self.size,
             offset=self.size * self.page,
         )
@@ -34,12 +23,11 @@ class LimitOffsetPaginationParams:
     limit: int = Query(50, gt=0, le=100, description="Page size limit")
     offset: int = Query(0, ge=0, description="Page offset")
 
-    def __post_init__(self) -> None:
-        self.limit = _get_value(self.limit)
-        self.offset = _get_value(self.offset)
-
-    def to_limit_offset(self) -> LimitOffsetPaginationParams:
-        return self
+    def to_limit_offset(self) -> LimitOffsetParams:
+        return LimitOffsetParams(
+            limit=self.limit,
+            offset=self.offset,
+        )
 
 
 __all__ = [

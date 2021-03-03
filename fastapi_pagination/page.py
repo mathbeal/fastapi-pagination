@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from dataclasses import asdict
 from typing import Generic, Sequence, TypeVar
 
 from pydantic import conint
@@ -40,13 +41,10 @@ class LimitOffsetPage(BasePage[T], Generic[T]):
 
     @classmethod
     def create(cls, items: Sequence[T], total: int, params: AbstractParams) -> LimitOffsetPage[T]:
-        params = params.to_limit_offset()
-
         return cls(
             total=total,
             items=items,
-            limit=params.limit,
-            offset=params.offset,
+            **asdict(params.to_limit_offset()),
         )
 
 

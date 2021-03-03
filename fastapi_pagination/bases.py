@@ -1,21 +1,25 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Generic, Sequence, Type, TypeVar
+from dataclasses import dataclass
+from typing import Generic, Sequence, Type, TypeVar
 
 from pydantic.generics import GenericModel
 from typing_extensions import Protocol
-
-if TYPE_CHECKING:
-    from .params import LimitOffsetPaginationParams  # pragma no cover
 
 T = TypeVar("T")
 C = TypeVar("C")
 
 
+@dataclass
+class LimitOffsetParams:
+    limit: int
+    offset: int
+
+
 class AbstractParams(Protocol):
     @abstractmethod
-    def to_limit_offset(self) -> LimitOffsetPaginationParams:
+    def to_limit_offset(self) -> LimitOffsetParams:
         pass  # pragma: no cover
 
 
@@ -32,4 +36,5 @@ class AbstractPage(GenericModel, Generic[T], ABC):
 __all__ = [
     "AbstractPage",
     "AbstractParams",
+    "LimitOffsetParams",
 ]
